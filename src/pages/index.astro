@@ -1,0 +1,60 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import cityCycling from '../assets/br1.jpg';
+---
+
+<BaseLayout title="Home" description="Small ideas for better urban living. Magazine Verde connects London and Sao Paulo through greener living, creativity, and community.">
+  <section class="panel hero" aria-labelledby="welcome-title">
+    <p class="eyebrow">A fresh perspective on everyday life</p>
+    <h1 id="welcome-title">Two cities. Shared ideas.<br /><span>A greener everyday.</span></h1>
+    <p>Welcome to Magazine Verde. A space for curious people, local stories, and small ideas that make city life a little better.</p>
+    <p>From London to S&atilde;o Paulo, we explore new ways to move, create, and connect. Because healthier, happier cities begin with the things we do together.</p>
+    <div class="actions">
+      <a class="button" href="/projects/">Explore our projects <span aria-hidden="true">&nearr;</span></a>
+      <a class="button secondary" href="/contact/">Join the conversation</a>
+    </div>
+  </section>
+
+  <section class="panel content-panel" aria-labelledby="ideas-title">
+    <div class="section-header">
+      <h2 id="ideas-title">Small ideas.<br />Meaningful change.</h2>
+      <p>A few of the things that inspire us to look at our cities differently.</p>
+    </div>
+    <div class="topic-grid">
+      <article class="topic">
+        <span class="topic-number" aria-hidden="true">01 / MOVE</span>
+        <h3>Take the scenic route.</h3>
+        <p>On foot or on two wheels, a different journey can reveal a whole new side of the place you call home.</p>
+      </article>
+      <article class="topic">
+        <span class="topic-number" aria-hidden="true">02 / GROW</span>
+        <h3>Make room for green.</h3>
+        <p>A balcony garden, a shared green space, or a simpler daily habit. Better living can start small.</p>
+      </article>
+      <article class="topic">
+        <span class="topic-number" aria-hidden="true">03 / CONNECT</span>
+        <h3>Good things happen together.</h3>
+        <p>Meet your neighbours, share what you know, and discover the creative energy in your community.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="panel split-panel" aria-labelledby="stories-title">
+    <Image src={cityCycling} alt="People cycling beside trees and city buildings in Sao Paulo" widths={[400, 640]} sizes="(max-width: 760px) 100vw, 50vw" />
+    <div class="split-copy">
+      <p class="eyebrow">Our visual notebook</p>
+      <h2 id="stories-title">A little inspiration.<br />A different point of view.</h2>
+      <p>Explore a growing collection of images and ideas around urban life, greener choices, and our connection with Brazil.</p>
+      <a class="text-link" href="/projects/">Take a look at our projects <span aria-hidden="true">&nearr;</span></a>
+    </div>
+  </section>
+
+  <section class="panel closing-panel" aria-labelledby="hello-title">
+    <div>
+      <h2 id="hello-title">Have an idea to share?</h2>
+      <p>A local story, a creative project, or just a hello. We'd love to hear from you.</p>
+    </div>
+    <a class="button" href="/contact/">Let's talk <span aria-hidden="true">&nearr;</span></a>
+  </section>
+</BaseLayout>

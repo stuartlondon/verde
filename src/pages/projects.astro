@@ -1,0 +1,70 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { projects } from '../data/projects';
+---
+
+<BaseLayout title="Projects" description="Explore Magazine Verde's visual notebook of greener journeys, urban living, and connections with Brazil.">
+  <section class="panel hero" aria-labelledby="projects-title">
+    <p class="eyebrow">A growing collection</p>
+    <h1 id="projects-title">Ideas worth <span>exploring.</span></h1>
+    <p>A visual notebook of the places, people, and possibilities that inspire Magazine Verde. From everyday cycling to greener ways of living, here's a little of what catches our eye.</p>
+  </section>
+  <section aria-label="Project gallery" class="gallery-grid">
+    {projects.map((project) => (
+      <figure class="panel gallery-card">
+        <a class:list={['gallery-image', { contain: project.contain }]} href={project.image.src} data-gallery-image data-title={project.title} data-alt={project.alt} aria-label={`Enlarge image: ${project.title}`}>
+          <Image src={project.image} alt={project.alt} widths={[400, 720, 1100]} sizes="(max-width: 540px) 100vw, 50vw" />
+          <span class="image-action" aria-hidden="true">View image &nearr;</span>
+        </a>
+        <figcaption>
+          <p class="eyebrow">{project.category}</p>
+          <h2>{project.title}</h2>
+          <p>{project.description}</p>
+        </figcaption>
+      </figure>
+    ))}
+  </section>
+  <p class="gallery-note">A first selection from the Magazine Verde image collection. More projects and stories to come.</p>
+  <section class="panel closing-panel" aria-labelledby="share-title">
+    <div>
+      <h2 id="share-title">Something we should see?</h2>
+      <p>Tell us about a project, place, or idea making a difference near you.</p>
+    </div>
+    <a class="button" href="/contact/">Share an idea <span aria-hidden="true">&nearr;</span></a>
+  </section>
+  <dialog class="lightbox" aria-labelledby="image-title">
+    <div class="lightbox-header">
+      <h2 id="image-title"></h2>
+      <button type="button" data-close-gallery autofocus>Close <span aria-hidden="true">&times;</span></button>
+    </div>
+    <img data-full-image alt="" width="1100" height="800" />
+  </dialog>
+  <script>
+    const dialog = document.querySelector<HTMLDialogElement>('.lightbox');
+    const image = document.querySelector<HTMLImageElement>('[data-full-image]');
+    const title = document.querySelector<HTMLElement>('#image-title');
+    if (dialog && image && title) {
+      document.querySelectorAll<HTMLAnchorElement>('[data-gallery-image]').forEach((link) => {
+        link.addEventListener('click', (event) => {
+          if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+          event.preventDefault();
+          image.src = link.href;
+          image.alt = link.dataset.alt ?? '';
+          title.textContent = link.dataset.title ?? '';
+          dialog.showModal();
+        });
+      });
+      document.querySelector('[data-close-gallery]')?.addEventListener('click', () => dialog.close());
+      dialog.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          event.preventDefault();
+          dialog.close();
+        }
+      });
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+    }
+  </script>
+</BaseLayout>

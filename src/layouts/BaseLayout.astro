@@ -1,0 +1,97 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const navigation = [
+  { href: '/', label: 'Home' },
+  { href: '/projects/', label: 'Projects' },
+  { href: '/contact/', label: 'Contact' },
+];
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0b5d32" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preload" href="/fonts/league-spartan-800.ttf" as="font" type="font/ttf" crossorigin />
+    <title>{title} | Magazine Verde</title>
+    <script is:inline>
+      try {
+        if (localStorage.getItem('verde-theme') === 'yellow') {
+          document.documentElement.dataset.theme = 'yellow';
+        }
+      } catch (error) {
+        console.warn('Theme preferences could not be read.', error);
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="site-shell">
+      <header class="panel masthead">
+        <a class="brand" href="/" aria-label="Magazine Verde home">
+          <span class="wordmark">MAGAZINE <span>VERDE</span><span class="brand-dot" aria-hidden="true">.</span></span>
+          <span class="brand-line">Independent ideas. Greener cities.</span>
+        </a>
+        <div class="header-bottom">
+          <p class="city-label">LONDON <span aria-hidden="true">&times;</span> S&Atilde;O PAULO</p>
+          <nav aria-label="Main navigation">
+            {navigation.map(({ href, label }) => (
+              <a href={href} aria-current={currentPath === (href.replace(/\/$/, '') || '/') ? 'page' : undefined}>{label}</a>
+            ))}
+          </nav>
+        </div>
+      </header>
+      <main id="main" tabindex="-1">
+        <slot />
+      </main>
+      <footer class="site-footer">
+        <div>
+          <a class="footer-brand" href="/">Magazine Verde</a>
+          <p>Two cities. Shared ideas. A greener everyday.</p>
+        </div>
+        <div class="footer-actions">
+          <a href="/contact/">Say hello <span aria-hidden="true">&nearr;</span></a>
+          <button class="theme-toggle" type="button" aria-label="Use yellow theme" aria-pressed="false" hidden>
+            <span class="theme-dot" aria-hidden="true"></span>
+            <span data-theme-label>Go yellow</span>
+          </button>
+        </div>
+      </footer>
+    </div>
+    <script>
+      const toggle = document.querySelector<HTMLButtonElement>('.theme-toggle');
+      const label = document.querySelector<HTMLElement>('[data-theme-label]');
+      function updateThemeButton() {
+        const yellow = document.documentElement.dataset.theme === 'yellow';
+        toggle?.setAttribute('aria-pressed', String(yellow));
+        toggle?.setAttribute('aria-label', yellow ? 'Use green theme' : 'Use yellow theme');
+        if (label) label.textContent = yellow ? 'Go green' : 'Go yellow';
+      }
+      if (toggle) {
+        toggle.hidden = false;
+        updateThemeButton();
+        toggle.addEventListener('click', () => {
+          const next = document.documentElement.dataset.theme === 'yellow' ? 'green' : 'yellow';
+          document.documentElement.dataset.theme = next;
+          updateThemeButton();
+          try {
+            localStorage.setItem('verde-theme', next);
+          } catch (error) {
+            console.warn('Theme preferences could not be saved.', error);
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

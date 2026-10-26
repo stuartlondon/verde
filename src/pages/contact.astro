@@ -1,0 +1,68 @@
+---
+export const prerender = false;
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { contactRecipient, handleContact, type ContactFields } from '../lib/contact';
+
+let fields: ContactFields = { name: '', email: '', message: '' };
+let error: string | undefined;
+Astro.response.headers.set('Cache-Control', 'no-store');
+if (Astro.request.method === 'POST') {
+  const result = await handleContact(Astro.request, Astro.clientAddress);
+  if (result.sent) return Astro.redirect('/contact/?sent=1#form-title', 303);
+  Astro.response.status = result.status;
+  if (result.status === 429) Astro.response.headers.set('Retry-After', '900');
+  fields = result.fields;
+  error = result.error;
+} else if (Astro.request.method !== 'GET' && Astro.request.method !== 'HEAD') {
+  Astro.response.status = 405;
+  Astro.response.headers.set('Allow', 'GET, HEAD, POST');
+  error = 'Please use the form below to send a message.';
+}
+const sent = Astro.request.method === 'GET' && Astro.url.searchParams.get('sent') === '1';
+---
+
+<BaseLayout title="Contact" description="Have a story, project, or idea to share? Get in touch with Magazine Verde and join the conversation about greener city living.">
+  <section class="panel hero" aria-labelledby="contact-title">
+    <p class="eyebrow">Good things start with a conversation</p>
+    <h1 id="contact-title">Let's make <span>a connection.</span></h1>
+    <p>Have a local story, a project you're proud of, or an idea for a greener everyday? We'd love to hear it. A simple hello is welcome, too.</p>
+  </section>
+  <div class="contact-grid">
+    <aside class="panel content-panel contact-aside" aria-labelledby="hello-title">
+      <p class="eyebrow">Say hello</p>
+      <h2 id="hello-title">Small ideas.<br />Open conversations.</h2>
+      <p>Use the form to get in touch, or send an email directly. Let's see what we can create together.</p>
+      <p class="contact-email"><a href={`mailto:${contactRecipient}`}>{contactRecipient}</a></p>
+      <div class="contact-detail">
+        <p class="eyebrow">Across two cities</p>
+        <p>London &times; S&atilde;o Paulo<br />Connected by curiosity and community.</p>
+      </div>
+    </aside>
+    <section class="panel content-panel" aria-labelledby="form-title">
+      <h2 id="form-title" style="margin-bottom: 24px">Send a little hello.</h2>
+      <form class="contact-form" action="/contact/#form-title" method="post" accept-charset="UTF-8" aria-describedby="form-note">
+        {sent && <p class="notice" role="status">Thank you for getting in touch. Your message has been sent, and we'll reply to the email address you provided.</p>}
+        {error && <p class="notice" role="alert">{error} <a href={`mailto:${contactRecipient}`}>Email {contactRecipient}</a></p>}
+        <div class="field">
+          <label for="name">Your name</label>
+          <input id="name" name="name" type="text" autocomplete="name" required minlength="2" maxlength="100" value={fields.name} />
+        </div>
+        <div class="field">
+          <label for="email">Email address</label>
+          <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" value={fields.email} />
+        </div>
+        <div class="field">
+          <label for="message">Your message</label>
+          <textarea id="message" name="message" rows="7" required minlength="10" maxlength="5000">{fields.message}</textarea>
+        </div>
+        <div class="honeypot" aria-hidden="true">
+          <label for="website">Leave this field empty</label>
+          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+        <p class="form-note" id="form-note">All fields are required. We'll use your details to reply to your enquiry. Please don't include sensitive information.</p>
+        <button class="button" type="submit">Send message <span aria-hidden="true">&nearr;</span></button>
+      </form>
+    </section>
+  </div>
+</BaseLayout>
