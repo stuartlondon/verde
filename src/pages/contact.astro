@@ -1,25 +1,8 @@
 ---
-export const prerender = false;
-
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { contactRecipient, handleContact, type ContactFields } from '../lib/contact';
 
-let fields: ContactFields = { name: '', email: '', message: '' };
-let error: string | undefined;
-Astro.response.headers.set('Cache-Control', 'no-store');
-if (Astro.request.method === 'POST') {
-  const result = await handleContact(Astro.request, Astro.clientAddress);
-  if (result.sent) return Astro.redirect('/contact/?sent=1#form-title', 303);
-  Astro.response.status = result.status;
-  if (result.status === 429) Astro.response.headers.set('Retry-After', '900');
-  fields = result.fields;
-  error = result.error;
-} else if (Astro.request.method !== 'GET' && Astro.request.method !== 'HEAD') {
-  Astro.response.status = 405;
-  Astro.response.headers.set('Allow', 'GET, HEAD, POST');
-  error = 'Please use the form below to send a message.';
-}
-const sent = Astro.request.method === 'GET' && Astro.url.searchParams.get('sent') === '1';
+const contactRecipient = 'stuart@1976.london';
+const returnUrl = new URL('/contact/thanks/', Astro.site).href;
 ---
 
 <BaseLayout title="Contact" description="Have a story, project, or idea to share? Get in touch with Magazine Verde and join the conversation about greener city living.">
@@ -41,26 +24,27 @@ const sent = Astro.request.method === 'GET' && Astro.url.searchParams.get('sent'
     </aside>
     <section class="panel content-panel" aria-labelledby="form-title">
       <h2 id="form-title" style="margin-bottom: 24px">Send a little hello.</h2>
-      <form class="contact-form" action="/contact/#form-title" method="post" accept-charset="UTF-8" aria-describedby="form-note">
-        {sent && <p class="notice" role="status">Thank you for getting in touch. Your message has been sent, and we'll reply to the email address you provided.</p>}
-        {error && <p class="notice" role="alert">{error} <a href={`mailto:${contactRecipient}`}>Email {contactRecipient}</a></p>}
+      <form class="contact-form" action={`https://formsubmit.co/${contactRecipient}`} method="post" accept-charset="UTF-8" aria-describedby="form-note">
+        <input type="hidden" name="_subject" value="New Magazine Verde enquiry" />
+        <input type="hidden" name="_template" value="table" />
+        <input type="hidden" name="_next" value={returnUrl} />
         <div class="field">
           <label for="name">Your name</label>
-          <input id="name" name="name" type="text" autocomplete="name" required minlength="2" maxlength="100" value={fields.name} />
+          <input id="name" name="name" type="text" autocomplete="name" required minlength="2" maxlength="100" />
         </div>
         <div class="field">
           <label for="email">Email address</label>
-          <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" value={fields.email} />
+          <input id="email" name="email" type="email" autocomplete="email" required maxlength="254" />
         </div>
         <div class="field">
           <label for="message">Your message</label>
-          <textarea id="message" name="message" rows="7" required minlength="10" maxlength="5000">{fields.message}</textarea>
+          <textarea id="message" name="message" rows="7" required minlength="10" maxlength="5000"></textarea>
         </div>
         <div class="honeypot" aria-hidden="true">
           <label for="website">Leave this field empty</label>
-          <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          <input id="website" name="_honey" type="text" tabindex="-1" autocomplete="off" />
         </div>
-        <p class="form-note" id="form-note">All fields are required. We'll use your details to reply to your enquiry. Please don't include sensitive information.</p>
+        <p class="form-note" id="form-note">Name, email, and message are required. FormSubmit processes your enquiry so we can reply. After you select Send message, you may be asked to complete a CAPTCHA on their site. Please don't include sensitive information. See <a href="https://formsubmit.co/privacy.pdf" target="_blank" rel="noopener noreferrer">FormSubmit's privacy policy</a>.</p>
         <button class="button" type="submit">Send message <span aria-hidden="true">&nearr;</span></button>
       </form>
     </section>
