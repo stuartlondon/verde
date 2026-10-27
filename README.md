@@ -6,6 +6,8 @@ there is no CMS or client framework.
 
 Public URL: **https://magazineverde.1976.london/**
 
+Repository: **https://github.com/stuartlondon/verde**
+
 ## Editing
 
 - `src/pages/index.astro`: welcoming home page.
@@ -32,13 +34,15 @@ development machine only. Project: `/home/stuart/sites/astro/verde-astro`.
 
 ```sh
 npm ci
-npm run dev
+npm run dev -- --background
 ```
 
-Development uses port 4387. For MacBook/LAN access when needed:
+Development uses port 4387. Manage the background server with
+`npm run astro -- dev status`, `npm run astro -- dev logs`, and
+`npm run astro -- dev stop`. For MacBook/LAN access when needed:
 
 ```sh
-npm run dev -- --host 0.0.0.0
+npm run dev -- --background --host 0.0.0.0
 ```
 
 Browse `http://192.168.1.251:4387/` if that is still the Beelink's LAN address.
@@ -99,12 +103,39 @@ is needed for a static site posting directly to FormSubmit.
 Do not upload source code, `node_modules/`, `.git/`, `.env` files, or server
 credentials. Standard cPanel static hosting is sufficient.
 
+## Version control
+
+The `main` branch holds the static Astro site. From an existing checkout, review,
+validate, commit, and push only the intended changes:
+
+```sh
+git status
+git diff
+npm run check
+npm test
+git add <specific-files>
+git commit -m "Describe the change"
+git push origin main
+```
+
+GitHub stores the source and its history; pushing does **not** deploy the site.
+Deployment remains the manual cPanel upload described above.
+Build output, dependencies, environment files, and deployment zip archives are
+excluded from version control. The supplied Astro process and Beelink server
+knowledge-base documents are local reference material and are not included in
+this repository.
+
 ## Status
 
 Switched from the initial SMTP/Node implementation to static hosting with
-FormSubmit at Stuart's request. Git is local; no remote is assumed.
+FormSubmit at Stuart's request. The source repository is
+`stuartlondon/verde` on GitHub.
 No cPanel, Apache, DNS, firewall, WordPress, or mail-account configuration has
 been changed. Supplied project-process and Beelink guidance remain unmodified.
 
 Next: upload the static build, activate the form if requested, and confirm a
 real test message reaches Stuart's inbox before sharing the form as verified.
+
+Client content editing is still under discussion: no CMS, private dashboard,
+or automatic deployment has been implemented. The WordPress dashboard at
+1976uk.com is a possible feature/UX reference, not part of this Astro site.
